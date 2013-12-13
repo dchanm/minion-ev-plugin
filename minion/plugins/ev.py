@@ -65,13 +65,15 @@ def hasEvOid(cert):
       #                   , ...)
       # , ...)
       # http://pyasn1.sourceforge.net/rfc2459.html
-      return str(data[0][0]) in EV_OIDS
+      certPolicyId = data[0].getComponentByPosition(0).getComponentByPosition(0)
+      return certPolicyId.prettyPrint() in EV_OIDS
 
   return False
 
 class EVPlugin(BlockingPlugin):
     PLUGIN_NAME = "EV Certificate Check"
     PLUGIN_VERSION = "0.1"
+    PLUGIN_WEIGHT = "light"
 
     FURTHER_INFO = [ {"URL": "http://en.wikipedia.org/wiki/Extended_Validation_Certificate",
                       "Title": "Wikipedia - Extended Validation Certificate"} ]
@@ -110,8 +112,8 @@ class EVPlugin(BlockingPlugin):
           connection.connect((host, port))
           connection.setblocking(1)
 
-          # override default timeout (30) with 6 second timeout
-          tv = struct.pack('LL', 6, 0)
+          # override default timeout (30) with 3 second timeout
+          tv = struct.pack('LL', 3, 0)
           connection.setsockopt(socket.SOL_SOCKET, socket.SO_RCVTIMEO, tv)
 
           connection.set_connect_state()
